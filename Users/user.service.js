@@ -8,36 +8,12 @@ async function Register(username,password)
     const user = new User({username, password : hash})
     return await user.save()
 }
-/*
-async function WriteInfos()
-{
-    let logs = []
-    var customerLogin = await prompt("Please enter Login");
-    if (customerLogin!= null) {
-    Console.log("Hello " + customerLogin + "! How are you today?");
-    logs.push(customerLogin);
-    }
-    var customerPassword = await prompt("Please enter password");
-    if (customerPassword!= null) {
-        Console.log("Hello " + customerPassword + "! How are you today?");
-        logs.push(customerPassword);
-    }
-    return logs;
-}
-const Register = (req, res)=>{
-    log = WriteInfos();
-    User.create({
-        username: log[0],
-        password : log[1]
-    }).then(user=>{
-        res.status(200).json(user)
-    })
-    .catch(err=>{
-        res.json(err)
-    })
-}
-*/
 
+async function checkPassword(username,password)
+{
+    const user = await User.findOne({username})
+    return await bcrypt.compare(password,user.password)
+}
 /*
 const Register = (req, res)=>{
     User.create({
@@ -72,4 +48,4 @@ const GetAll = (req, res)=>{
       res.json(err)
   })
 }
-module.exports = { Register, Login, GetSelf, UpdateSelf, DeleteSelf,GetAll}
+module.exports = { Register, checkPassword,Login, GetSelf, UpdateSelf, DeleteSelf,GetAll}
