@@ -17,6 +17,12 @@ const locationController = require('./locations/locations.controller')
 const userController = require('./Users/user.controller')
 const app = express()
 const port = 3000
+/*
+const bodyParser = require('body-parser')
+const passport = require('passport')
+const LocalStrategy = require('passport-local')
+passport.user(new LocalStrategy)
+*/
 // Connection
 Connect();
 app.use(express.json())

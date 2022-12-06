@@ -2,18 +2,58 @@
 
 const Location = require('./locations.model')
 
-const createLocation = (req, res)=>{
-  Location.create({
-      location: req.body.location,
-      filmName : "Retour vers le Futur"
-  }).then(location=>{
-      res.status(200).json(location)
-  })
-  .catch(err=>{
-      res.json(err)
-  })
+async function CreateLocation(filmname=null,filmtype=null,years=null,producer = null,end = null, distr = null, geoloc = null,sourceloc = null,filmdir = null,addr=null,start=null) // values not given are null
+{
+    const location = new Location({
+      filmName :filmname,
+      filmType:filmtype,
+      year:years,
+      filmProducerName:producer,
+      endDate:end,
+      district:distr,
+      geolocation : geoloc,
+      sourceLocationID : sourceloc,
+      filmDirectorName : filmdir,
+      address : addr,
+      startDate : start})
+    return await location.save()
 }
-
+const updateLocation = (req, res)=>{ 
+  const filmname = req.body?.filmName;
+  const filmtype = req.body?.filmType;
+  const years = req.body?.year;
+  const producer = req.body?.filmProducerName;
+  const end = req.body?.endDate;
+  const distr = req.body?.district;
+  const geoloc = req.body?.geolocation;
+  const sourceloc = req.body?.sourceLocationID;
+  const filmdir = req.body?.filmDirectorName;
+  const addr = req.body?.address;
+  const start = req.body?.startDate;
+  Location.findOneAndUpdate({_id :req.params.id},
+    {
+      $set: {
+      filmName : filmname,
+      filmType : filmtype,
+      year : years,
+      filmProducerName : producer,
+      endDate : end,
+      district : distr,
+      geolocation : geoloc,
+      sourceLocationID : sourceloc,
+      filmDirectorName : filmdir,
+      address : addr,
+      startDate : start
+    },
+  },
+      {new:true},
+      (err, Location) => {
+        if (err) {
+          res.send(err);
+        } else res.json(Location);
+      }
+    );
+}
 const getLocations = (req, res)=>{
   Location.find()
   .then(locations=>{
@@ -32,21 +72,6 @@ const getLocationbyID = (req, res)=>{
       res.json(err)
   })
 }
-const updateLocations = (req, res)=>{
-  Location.findOneAndUpdate({_id :req.params.id},
-    {
-      $set: {
-      filmName : "Retour vers le Futur 2"
-    },
-  },
-      {new:true},
-      (err, Location) => {
-        if (err) {
-          res.send(err);
-        } else res.json(Location);
-      }
-    );
-}
 const deleteLocation = (req, res)=>{
   Location.findByIdAndDelete(req.params.id)
   .then(location=>{
@@ -56,4 +81,4 @@ const deleteLocation = (req, res)=>{
       res.json(err)
   })
 }
-module.exports = { createLocation, getLocations, getLocationbyID, updateLocations, deleteLocation}
+module.exports = { CreateLocation, getLocations, getLocationbyID,updateLocation, deleteLocation}
