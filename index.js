@@ -17,19 +17,17 @@ const locationController = require('./locations/locations.controller')
 const userController = require('./Users/user.controller')
 const app = express()
 const port = 3000
-/*
 const bodyParser = require('body-parser')
-const passport = require('passport')
-const LocalStrategy = require('passport-local')
-passport.user(new LocalStrategy)
-*/
+const localStrategy = require("./auth/local.strategy")
+const jwtStrategy = require("./auth/jwt.strategy")
+
 // Connection
 Connect();
 app.use(express.json())
+app.use(bodyParser.json())
 app.use(express.urlencoded({extend:false}))
 app.use(locationController)
 app.use(userController)
-
 
 app.listen(port, () => {
 	console.log(`API listening on port ${port}, visit http://localhost:${port}/`)

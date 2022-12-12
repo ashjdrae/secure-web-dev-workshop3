@@ -7,10 +7,8 @@ router.get("/",(req, res) => {
 
 const {getLocations, getLocationbyID, updateLocation, deleteLocation} = require('./locations.service.js')
 
-
-router.get('/locations', getLocations)
-router.get('/locations/:id',getLocationbyID)
-router.post('/locations',async(req,res)=> {
+async function CreateLocation(req,res)
+{
   const location = await locationsService.CreateLocation(
     req.body?.filmName,
     req.body?.filmType,
@@ -25,7 +23,12 @@ router.post('/locations',async(req,res)=> {
     req.body?.startDate
     )
   res.status(200).send(location)
-})
+}
+
+router.get('/locations', getLocations)
+router.get('/locations/:id',getLocationbyID)
+router.post('/locations', CreateLocation)
 router.put('/locations/:id',updateLocation)
 router.delete('/locations/:id', deleteLocation)
+
 module.exports = router

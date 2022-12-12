@@ -1,51 +1,111 @@
 // This file holds the Business-Logic layer, interacting with Data Layer
 const bcrypt = require("bcrypt")
 const User = require('./user.model')
+const JWTStrategy = require('../auth/jwt.strategy')
 
-async function Register(username,password)
-{
-    const hash = await bcrypt.hash(password,10);
-    const user = new User({username, password : hash})
-    return await user.save()
-}
-
-async function checkPassword(username,password)
-{
-    const user = await User.findOne({username})
-    return await bcrypt.compare(password,user.password)
-}
-/*
-const Register = (req, res)=>{
-    User.create({
-        username: 'alban',
-        password : 'SWD1234'
-    }).then(user=>{
-        res.status(200).json(user)
-    })
-    .catch(err=>{
+async function GetSelf (req,res){
+    var UserID = await JWTStrategy.GetIDFromToken()
+    if(UserID != null)
+    {
+        User.findById(UserID)
+        .then(user=>{
+        res.json(user)
+        })
+        .catch(err=>{
         res.json(err)
-    })
-}
-*/
-const Login = (req, res)=>{
+        })
+    }
+    else
+    {
+        res.json("You need to login first")
+    }
+  }
 
-}
-const GetSelf = (req, res)=>{
+  async function UpdateSelf (req, res)
+  {
+      var UserID = await JWTStrategy.GetIDFromToken()
+      if(UserID != null)
+      {
+        const login = req.body?.username;
+        const mdp = req.body?.password;
+        const hash = await bcrypt.hash(mdp,10);
+          User.findByIdAndUpdate(UserID,
+          {
+            $set: {
+            username : login,
+            password : hash
+          },
+        },
+            {new:true},
+            (err) => {
+              if (err) {
+                res.send(err);
+              } else res.json("Change done. Please reconnect with your new logs");
+            }
+          );
+      }
+      else
+      {
+          res.json("You need to login first")
+      }
+      JWTStrategy.ResetToken();
+  }
 
+async function DeleteSelf (req,res)
+{
+    var UserID = await JWTStrategy.GetIDFromToken()
+    if(UserID != null)
+    {
+        User.findByIdAndDelete(UserID)
+        .then(user=>{
+            res.json(user,"Delete done, please reconnect with another user")
+        })
+        .catch(err=>{
+            res.json(err)
+        })
+    }
+    else
+    {
+        res.json("You need to login first")
+    }
+    JWTStrategy.ResetToken();
 }
-const UpdateSelf = (req, res)=>{
+async function GetAll (req,res)
+{
+    var UserID = await JWTStrategy.GetIDFromToken()
+    if(UserID != null)
+    {
+        User.find()
+        .then(users=>{
+        res.json(users)
+        })
+        .catch(err=>{
+        res.json(err)
+        })
+    }
+    else
+    {
+        res.json("You need to login first")
+    }
+}
+async function authMiddleware (req,res)
+{
+    var UserID = await JWTStrategy.GetIDFromToken()
+    if(UserID != null)
+    {
+        User.findById(UserID)
+        .then(user=>{
+        return user.role
+        })
+        .catch(err=>{
+        res.json(err)
+        })
+    }
+    else
+    {
+        res.json("You need to login first")
+    }
+}
+const roleMiddleware = (allowedRoles) => (req, res, next) => allowedRoles.includes(req.user?.role) ? next() : res.status(403).send()
 
-}
-const DeleteSelf = (req, res)=>{
-
-}
-const GetAll = (req, res)=>{
-    User.find()
-  .then(users=>{
-      res.json(users)
-  })
-  .catch(err=>{
-      res.json(err)
-  })
-}
-module.exports = { Register, checkPassword,Login, GetSelf, UpdateSelf, DeleteSelf,GetAll}
+module.exports = { GetSelf, UpdateSelf, DeleteSelf,GetAll,authMiddleware, roleMiddleware}
