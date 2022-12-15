@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt")
-const User = require('../Users/user.model')
+const {getUserModel}=require('../Users/user.service');
+const User = getUserModel();
 
 async function Register(username,password)
 {
@@ -8,7 +9,7 @@ async function Register(username,password)
     return await user.save()
 }
 
-async function checkPassword(username,password,req,res)
+async function checkPassword(username,password)
 {
     const user = await User.findOne({username})
     return await bcrypt.compare(password,user.password)
