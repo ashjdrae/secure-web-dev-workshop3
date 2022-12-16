@@ -80,15 +80,14 @@ async function getLocations(req,res)
       res.json(locations)
   })
 }
-async function getLocationbyID(req, res)
+async function getLocationbyID(locationID)
 {
-  Location.find({_id :req.params.id})
-  .then(location=>{
-      res.json(location)
-  })
-  .catch(err=>{
-      res.json(err)
-  })
+  const location = await Location.find({_id: locationID})
+  if (!location)
+  {
+    throw new Error ('NotFound')
+  }
+  return location;
 }
 
 async function deleteLocation(req, res)
