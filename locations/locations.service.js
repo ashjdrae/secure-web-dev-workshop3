@@ -2,76 +2,26 @@
 const Location = require('./locations.model')
 require('dotenv').config()
 
-async function DisplayCreatedLocation(req,res)
+async function CreateLocation(locationbody)
 {
-  const location = await CreateLocation(
-    req.body?.filmName,
-    req.body?.filmType,
-    req.body?.year,
-    req.body?.filmProducerName,
-    req.body?.endDate,
-    req.body?.district,
-    req.body?.geolocation,
-    req.body?.sourceLocationId,
-    req.body?.filmDirectorName,
-    req.body?.address,
-    req.body?.startDate
-    )
-  res.status(200).send(location)
+  try {
+    const location = new Location(locationbody)
+    return await location.save()
+  }
+  catch {
+    return "Bad Request"
+  }
 }
 
-async function CreateLocation(filmname=null,filmtype=null,years=null,producer = null,end = null, distr = null, geoloc = null,sourceloc = null,filmdir = null,addr=null,start=null) // values not given are null
-{
-  const location = new Location({
-    filmName :filmname,
-    filmType:filmtype,
-    year:years,
-    filmProducerName:producer,
-    endDate:end,
-    district:distr,
-    geolocation : geoloc,
-    sourceLocationID : sourceloc,
-    filmDirectorName : filmdir,
-    address : addr,
-    startDate : start})
-  return await location.save()
-}
-async function updateLocation (req, res)
+async function UpdateLocationByID (locationID,change)
 { 
-  const filmname = req.body?.filmName;
-  const filmtype = req.body?.filmType;
-  const years = req.body?.year;
-  const producer = req.body?.filmProducerName;
-  const end = req.body?.endDate;
-  const distr = req.body?.district;
-  const geoloc = req.body?.geolocation;
-  const sourceloc = req.body?.sourceLocationID;
-  const filmdir = req.body?.filmDirectorName;
-  const addr = req.body?.address;
-  const start = req.body?.startDate;
-  Location.findOneAndUpdate({_id :req.params.id},
-    {
-      $set: {
-      filmName : filmname,
-      filmType : filmtype,
-      year : years,
-      filmProducerName : producer,
-      endDate : end,
-      district : distr,
-      geolocation : geoloc,
-      sourceLocationID : sourceloc,
-      filmDirectorName : filmdir,
-      address : addr,
-      startDate : start
-    },
-  },
-      {new:true},
-      (err, Location) => {
-        if (err) {
-          res.send(err);
-        } else res.json(Location);
-      }
-    );
+  const location = await Location.findById(locationID)
+  if (!location)
+  {
+    throw new Error ('NotFound')
+  }
+  await Location.findByIdAndUpdate(locationID,change)
+  return "Update Done"
 }
 async function getLocations(req,res)
 {
@@ -82,7 +32,7 @@ async function getLocations(req,res)
 }
 async function getLocationbyID(locationID)
 {
-  const location = await Location.find({_id: locationID})
+  const location = await Location.findById(locationID)
   if (!location)
   {
     throw new Error ('NotFound')
@@ -90,14 +40,13 @@ async function getLocationbyID(locationID)
   return location;
 }
 
-async function deleteLocation(req, res)
+async function deleteLocationByID(locationID)
 {
-  Location.findByIdAndDelete(req.params.id)
-  .then(location=>{
-      res.json("Delete Done")
-  })
-  .catch(err=>{
-      res.json(err)
-  })
+  const location = await Location.findByIdAndDelete(locationID)
+  if (!location)
+  {
+    throw new Error ('NotFound')
+  }
+  return "Delete Done";
 }
-module.exports = { DisplayCreatedLocation, getLocations, getLocationbyID,updateLocation, deleteLocation}
+module.exports = {CreateLocation, getLocations, getLocationbyID,UpdateLocationByID, deleteLocationByID}

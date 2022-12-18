@@ -1,50 +1,24 @@
-# Workshop 3 - Create an API (ExpressJS)
+Bonjour,
 
-## 🌟 Goal
+J'ai réalisé une CRUD API web sécurisée sur les lieux de tournage à Paris.
+Celle-ci utilise des users avec authentifications et permissions (CRUD options également)
+Pour run le code, il faut ouvrir insomnia, postman, ou un navigateur Web et entrer des requêtes.
+L'adresse du site est indiquée dans la console quand le code est run
 
-> Build a REST API with ExpressJS
+Il faut d'abord commencer par se créer un compte (/users/register), en remplissant le json body
+Il faut ensuite se login, indispensable pour accéder aux autres fonctionnalités (/users/login),
+en remplissant le json body.
+Vous pourrez ensuite accéder à toutes les fonctionnalités du code, les chemins sont spécifiés dans
+le user controller et dans le location controller. Les noms des chemins sont explicites, vous saurez
+donc lequel choisir selon ce que vous souhaitez faire. Lorsque vous faites une requête, il faut bien penser à mettre votre token, obtenu après le login, pour que l'autorisation vous soit accordée
 
-## 👷 Prerequisites
+Certaines fonctionnalités ne sont accessibles que si vous avez un compte admin.
+Si vous souhaitez accéder à toutes les fonctionnalités, il faudra s'en créer un. Pour cela, la solution la plus simple est d'aller dans le dossier auth puis le fichier local.strategy, et le modifier : modifier la fonction Register. Par défaut, celle-ci attribue le rôle "basic_user" aux users créés, dans le but de ne pas attribuer plus de permissions que nécessaires aux nouveaux users créés. Il vous suffit donc de remplacer "basic_user par "admin". Pensez après avoir créé le compte admin, à bien remodifier et remettre "basic_user" pour éviter que les futurs users créés ne soient tous admin.
 
-1. Fork this repository then clone it on your computer
-2. install Insomnia (or your API Testing tool of choice)
-3. Paste your .env file from workshop2 containing credentials to your Mongo Database
+Le fichier .env contient les informations de connexion, il est indispensable de modifier le MONGO_URI en fonction de votre chaîne de connexion à votre database mongoDB
 
-## 🗒 What to do
+Le code a également été passé sur SonarCloud pour supprimer le plus de Code Smell possibles.
+Voici le lien :
+https://sonarcloud.io/summary/overall?id=ashjdrae_secure-web-dev-workshop3
 
-> ⚠ Commit your changes after **each** instruction, following the commit message format:
-> ```text
-> feat(1): Initiate NPM Project
-> ```
-
-1. Install existing packages with `npm install`
-   > ```shell
-   >  npm install
-   > ```
-2. Add NPM packages `express`
-   > Mongoose is a package making mongo request easier and more secure
-   > ```shell
-   > npm install --save express
-   > ```
-3. Put your database credentials in a file named `.env` (from Workshop2)
-4. Take a look at the architecture 
-   > One Folder per entity.
-   > In each folder, 3 files:
-   > 
-   > entity.controller.js -> Presentation Layer, API
-   > 
-   > entity.service.js -> Business Logic Layer
-   > 
-   > entity.model.js -> Database Layer
-5. Implement a "Hello World" route, on GET / that returns "Hello World"
-   1. Visit the route at http://localhost:3000/
-6. Create the API CRUD for Location
-   1. Create routes at Presentation Layer
-   2. Implement business logic in the Location Service
-   > ```
-   > For reference, CRUD:
-   > Create: /locations
-   > Update: /locations/:id
-   > Request (Get All: /locations , Get One: /locations/:id)
-   > Delete: /locations/:id
-   > ```
+Joyeuses fêtes de fin d'année

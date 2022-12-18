@@ -1,7 +1,6 @@
 // This file holds the Business-Logic layer, interacting with Data Layer
 const bcrypt = require("bcrypt")
-const User = require('../Users/user.model')
-//const User = getUserModel();
+const User = getUserModel();
 
 function getUserModel()
 {
@@ -9,15 +8,14 @@ function getUserModel()
   return User;
 }
 
-async function GetSelf (req,res)
+async function GetSelf (UserID)
 {
-    User.findById(req.user._id).select("-password")
-    .then(user=>{
-    res.json(user)
-    })
-    .catch(err=>{
-    res.json(err)
-    })
+  const user = await User.findById(UserID).select("-password")
+  if (!user)
+  {
+    throw new Error ('NotFound')
+  }
+  return user;
 }
 
   async function UpdateSelf (req, res)
@@ -36,20 +34,19 @@ async function GetSelf (req,res)
         (err) => {
             if (err) {
             res.send(err);
-            } else res.json("Change done.");
+            } else res.status(200).send("Update done");
         }
         );
   }
 
-async function DeleteSelf (req,res)
+async function DeleteSelf (userID)
 {
-    User.findByIdAndDelete(req.user._id)
-    .then(user=>{
-        res.json("Delete done, please reconnect with another user")
-    })
-    .catch(err=>{
-        res.json(err)
-    })
+  const user = await User.findByIdAndDelete(userID)
+  if (!user)
+  {
+    throw new Error ('NotFound')
+  }
+  return "Delete Done";
 }
 async function GetAllUsers (req,res)
 {
@@ -70,7 +67,7 @@ async function UpdateUserRole (req,res)
           (err, User) => {
             if (err) {
               res.send(err);
-            } else res.json("Change Done");
+            } else res.status(200).send("Change Done");
           }
         );
 }
